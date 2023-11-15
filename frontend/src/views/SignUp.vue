@@ -70,11 +70,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { setItem } from '@/helper/persistanceStorage';
-import router from '@/router';
+import { setItem } from '../helper/persistanceStorage';
+import router from '../router/index';
 import * as Yup from 'yup';
 import bcrypt from 'bcryptjs';
-import axios from '@/api/axios';
+import axios from '../api/axios';
 import type { Errors, FormData } from '@/types';
 
 const formData = ref<FormData>({
@@ -108,7 +108,7 @@ const onSubmit = async (e: any) => {
     await schema.validate(formData.value, { abortEarly: false });
     const hashedPassword = await bcrypt.hash(formData.value.password, 10);
 
-    const response = await axios.post('http://localhost:5173/users', {
+    const response = await axios.post('/api/users', {
       ...formData.value,
       password: hashedPassword,
     });
