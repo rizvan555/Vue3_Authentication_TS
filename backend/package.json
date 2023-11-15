@@ -23,5 +23,5 @@
   "devDependencies": {
     "@types/mongoose": "^5.11.97"
   },
-  "port": 3001
+  "port": 5173
 }

@@ -56,9 +56,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { setItem } from '@/helper/persistanceStorage';
-import router from '../router';
+import router from '@/router';
 import * as Yup from 'yup';
-import axios from 'axios';
+import axios from '@/api/axios';
 
 interface FormData {
   email: string;
@@ -96,7 +96,7 @@ const onSubmit = async (e: any) => {
 
     await schema.validate(formData.value, { abortEarly: false });
 
-    const response = await axios.post('http://localhost:3001/signIn', {
+    const response = await axios.post('http://localhost:5173/users/login', {
       ...formData.value,
     });
 

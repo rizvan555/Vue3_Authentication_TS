@@ -1,74 +1,3 @@
-<script setup lang="ts">
-import { ref } from 'vue';
-import { setItem } from '@/helper/persistanceStorage';
-import router from '../router';
-import * as Yup from 'yup';
-import bcrypt from 'bcryptjs';
-import axios from 'axios';
-
-interface FormData {
-  username: string;
-  email: string;
-  password: string;
-}
-
-const formData = ref<FormData>({
-  username: '',
-  email: '',
-  password: '',
-});
-
-const isSubmitting = ref(false);
-
-const schema = Yup.object().shape({
-  username: Yup.string()
-    .min(3, 'Username must be at least 3 characters')
-    .required('Username is required'),
-  email: Yup.string().email('Invalid email').required('Email is required'),
-  password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
-});
-
-interface Errors {
-  [key: string]: string;
-}
-
-const errors = ref<Errors>({});
-
-const clearError = (field: keyof Errors) => {
-  errors.value[field] = '';
-};
-
-const onSubmit = async (e: any) => {
-  e.preventDefault();
-  try {
-    isSubmitting.value = true;
-    await schema.validate(formData.value, { abortEarly: false });
-    const hashedPassword = await bcrypt.hash(formData.value.password, 10);
-
-    const response = await axios.post('http://localhost:3001/signUp', {
-      ...formData.value,
-      password: hashedPassword,
-    });
-
-    console.log('Server Response:', response.data);
-
-    setItem('JWT', response.data.token);
-    router.push({ name: 'signIn' });
-  } catch (error: any) {
-    if (error.name === 'ValidationError') {
-      errors.value = error.inner.reduce((acc: Errors, err: any) => {
-        acc[err.path] = err.message;
-        return acc;
-      }, {});
-      isSubmitting.value = false;
-    }
-    console.error('Registration Error:', error);
-  }
-};
-</script>
-
 <template>
   <div class="auth-page">
     <div class="container page">
@@ -138,3 +67,65 @@ const onSubmit = async (e: any) => {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { setItem } from '@/helper/persistanceStorage';
+import router from '@/router';
+import * as Yup from 'yup';
+import bcrypt from 'bcryptjs';
+import axios from '@/api/axios';
+import type { Errors, FormData } from '@/types';
+
+const formData = ref<FormData>({
+  username: '',
+  email: '',
+  password: '',
+});
+
+const isSubmitting = ref(false);
+
+const schema = Yup.object().shape({
+  username: Yup.string()
+    .min(3, 'Username must be at least 3 characters')
+    .required('Username is required'),
+  email: Yup.string().email('Invalid email').required('Email is required'),
+  password: Yup.string()
+    .min(6, 'Password must be at least 6 characters')
+    .required('Password is required'),
+});
+
+const errors = ref<Errors>({});
+
+const clearError = (field: keyof Errors) => {
+  errors.value[field] = '';
+};
+
+const onSubmit = async (e: any) => {
+  e.preventDefault();
+  try {
+    isSubmitting.value = true;
+    await schema.validate(formData.value, { abortEarly: false });
+    const hashedPassword = await bcrypt.hash(formData.value.password, 10);
+
+    const response = await axios.post('http://localhost:5173/users', {
+      ...formData.value,
+      password: hashedPassword,
+    });
+
+    console.log('Server Response:', response.data);
+
+    setItem('JWT', response.data.token);
+    router.push({ name: 'signIn' });
+  } catch (error: any) {
+    if (error.name === 'ValidationError') {
+      errors.value = error.inner.reduce((acc: Errors, err: any) => {
+        acc[err.path] = err.message;
+        return acc;
+      }, {});
+      isSubmitting.value = false;
+    }
+    console.error('Registration Error:', error);
+  }
+};
+</script>

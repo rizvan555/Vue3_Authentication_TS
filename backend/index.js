@@ -8,10 +8,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
-
-app.use(cors());
-app.use(express.json());
+const PORT = process.env.PORT || 5173;
 
 mongoose.connect(process.env.MONGODB_URI, {
   dbName: 'vueDB',
@@ -24,13 +21,16 @@ const UserSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', UserSchema);
 
+app.use(cors());
+app.use(express.json());
+
 // Hello World Route
-app.get('/', (res) => {
+app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
 // Register Route
-app.post('/signUp', async (req, res) => {
+app.post('/users', async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const user = new User({
@@ -40,6 +40,7 @@ app.post('/signUp', async (req, res) => {
     });
     await user.save();
     res.status(201).json({ message: 'User registered successfully' });
+    console.log('Received POST request at /users');
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -47,7 +48,7 @@ app.post('/signUp', async (req, res) => {
 });
 
 // Login Route
-app.post('/signIn', async (req, res) => {
+app.post('/users/login', async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
