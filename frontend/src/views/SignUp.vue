@@ -115,7 +115,7 @@ const onSubmit = async (e: any) => {
 
     console.log('Server Response:', response.data);
 
-    setItem('JWT', response.data.token);
+    setItem('token', response.data.token);
     router.push({ name: 'signIn' });
   } catch (error: any) {
     if (error.name === 'ValidationError') {

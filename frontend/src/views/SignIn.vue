@@ -100,7 +100,7 @@ const onSubmit = async (e: any) => {
       ...formData.value,
     });
 
-    setItem('JWT', response.data.token);
+    setItem('token', response.data.token);
     router.push({ name: 'home' });
   } catch (error: any) {
     if (error.name === 'ValidationError') {
@@ -108,6 +108,14 @@ const onSubmit = async (e: any) => {
         acc[err.path] = err.message;
         return acc;
       }, {});
+    } else if (error.response) {
+      console.error(
+        'Server responded with error status:',
+        error.response.status
+      );
+      console.log('Response data:', error.response.data);
+    } else {
+      console.error('Error setting up request:', error.message);
     }
     isSubmitting.value = false;
     console.error('Login Error:', error);
