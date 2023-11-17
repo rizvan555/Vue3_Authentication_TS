@@ -30,7 +30,7 @@ const User = mongoose.model('User', UserSchema);
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Hello World Route
+// Hello World Test-Route
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
@@ -72,6 +72,33 @@ app.post('/users/login', async (req, res) => {
     });
     res.status(200).json({ token });
   } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//Get logged in user
+app.get('/users', async (req, res) => {
+  try {
+    const tokenHeader = req.headers.authorization;
+
+    if (!tokenHeader) {
+      return res
+        .status(401)
+        .json({ error: 'Unauthorized - Token not provided' });
+    }
+
+    const token = tokenHeader.split(' ')[1];
+    const decodedToken = jwt.verify(token, 'secretKey');
+    const userId = decodedToken.userId;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized - User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error fetching user data:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
