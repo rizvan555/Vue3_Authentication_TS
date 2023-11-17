@@ -59,13 +59,9 @@ import { setItem } from '../helper/persistanceStorage';
 import router from '../router/index';
 import * as Yup from 'yup';
 import axios from '../api/axios';
+import type { Errors, FormDataLogin } from '@/types';
 
-interface FormData {
-  email: string;
-  password: string;
-}
-
-const formData = ref<FormData>({
+const formData = ref<FormDataLogin>({
   email: '',
   password: '',
 });
@@ -78,10 +74,6 @@ const schema = Yup.object().shape({
     .min(6, 'Password must be at least 6 characters')
     .required('Password is required'),
 });
-
-interface Errors {
-  [key: string]: string;
-}
 
 const errors = ref<Errors>({});
 

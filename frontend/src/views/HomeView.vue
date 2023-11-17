@@ -1,12 +1,8 @@
 <script setup lang="ts">
+import type { User } from '@/types';
 import { getItem } from '../helper/persistanceStorage';
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
-
-interface User {
-  username: string;
-  email: string;
-}
 
 const users = ref<User[]>([]);
 

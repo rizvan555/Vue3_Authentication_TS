@@ -11,3 +11,8 @@ export interface FormDataLogin {
 export interface Errors {
   [key: string]: string;
 }
+
+export interface User {
+  username: string;
+  email: string;
+}
