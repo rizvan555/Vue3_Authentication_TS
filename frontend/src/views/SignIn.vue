@@ -87,11 +87,10 @@ const onSubmit = async (e: any) => {
     isSubmitting.value = true;
 
     await schema.validate(formData.value, { abortEarly: false });
-
+    console.log('FormData:', formData.value);
     const response = await axios.post('/api/users/login', {
       ...formData.value,
     });
-
     setItem('token', response.data.token);
     router.push({ name: 'home' });
   } catch (error: any) {
@@ -105,12 +104,10 @@ const onSubmit = async (e: any) => {
         'Server responded with error status:',
         error.response.status
       );
-      console.log('Response data:', error.response.data);
     } else {
       console.error('Error setting up request:', error.message);
     }
     isSubmitting.value = false;
-    console.error('Login Error:', error);
   }
 };
 </script>

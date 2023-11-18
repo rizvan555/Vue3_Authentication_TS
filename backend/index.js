@@ -38,12 +38,12 @@ app.get('/', (req, res) => {
 // Register Route
 app.post('/users', async (req, res) => {
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const user = new User({
       username: req.body.username,
       email: req.body.email,
-      password: hashedPassword,
+      password: req.body.password,
     });
+    user.password = await bcrypt.hash(user.password, 10);
     await user.save();
     res.status(201).json({ message: 'User registered successfully' });
     console.log('Received POST request at /users');
@@ -67,7 +67,7 @@ app.post('/users/login', async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ userId: user._id }, 'secretKey', {
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
       expiresIn: '1h',
     });
     res.status(200).json({ token });
