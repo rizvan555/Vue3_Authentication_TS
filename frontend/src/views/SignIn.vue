@@ -93,7 +93,6 @@ const onSubmit = async (e: any) => {
       },
       credentials: 'include',
     };
-    console.log('Request payload:', config);
     const response = await axios.post(
       '/api/users/login',
       formData.value,

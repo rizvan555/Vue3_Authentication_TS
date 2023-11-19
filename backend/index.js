@@ -5,8 +5,6 @@ import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 const corsOptions = {
@@ -15,6 +13,8 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 204,
 };
+
+dotenv.config();
 
 mongoose.connect(process.env.MONGODB_URI, {
   dbName: 'vueDB',
@@ -58,20 +58,27 @@ app.post('/users/login', async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Email not found' });
     }
+    console.log('User entered password:', req.body.password);
+    console.log('Database password:', user.password);
+
     const isPasswordValid = await bcrypt.compare(
       req.body.password,
       user.password
     );
+    console.log('isPasswordValid:', isPasswordValid);
+
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Invalid password' });
     }
+
     const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
       expiresIn: '1h',
     });
     res.status(200).json({ token });
   } catch (error) {
+    console.error('Login Error:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

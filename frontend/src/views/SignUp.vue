@@ -112,16 +112,9 @@ const onSubmit = async (e: any) => {
     };
     isSubmitting.value = true;
     await schema.validate(formData.value, { abortEarly: false });
-    const hashedPassword = await bcrypt.hash(formData.value.password, 10);
+    formData.value.password = await bcrypt.hash(formData.value.password, 10);
 
-    const response = await axios.post(
-      '/api/users',
-      {
-        ...formData.value,
-        password: hashedPassword,
-      },
-      config
-    );
+    const response = await axios.post('/api/users', formData.value, config);
 
     console.log('Server Response:', response.data);
 
