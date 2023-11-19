@@ -85,12 +85,21 @@ const onSubmit = async (e: any) => {
   e.preventDefault();
   try {
     isSubmitting.value = true;
-
     await schema.validate(formData.value, { abortEarly: false });
-    console.log('FormData:', formData.value);
-    const response = await axios.post('/api/users/login', {
-      ...formData.value,
-    });
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    };
+    console.log('Request payload:', config);
+    const response = await axios.post(
+      '/api/users/login',
+      formData.value,
+      config
+    );
+
     setItem('token', response.data.token);
     router.push({ name: 'home' });
   } catch (error: any) {
@@ -99,11 +108,11 @@ const onSubmit = async (e: any) => {
         acc[err.path] = err.message;
         return acc;
       }, {});
-    } else if (error.response) {
-      console.error(
-        'Server responded with error status:',
-        error.response.status
-      );
+    } else if (error.response && error.response.status === 401) {
+      errors.value = {
+        email: 'Invalid credentials',
+        password: 'Invalid credentials',
+      };
     } else {
       console.error('Error setting up request:', error.message);
     }

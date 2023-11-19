@@ -104,14 +104,24 @@ const clearError = (field: keyof Errors) => {
 const onSubmit = async (e: any) => {
   e.preventDefault();
   try {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true,
+    };
     isSubmitting.value = true;
     await schema.validate(formData.value, { abortEarly: false });
     const hashedPassword = await bcrypt.hash(formData.value.password, 10);
 
-    const response = await axios.post('/api/users', {
-      ...formData.value,
-      password: hashedPassword,
-    });
+    const response = await axios.post(
+      '/api/users',
+      {
+        ...formData.value,
+        password: hashedPassword,
+      },
+      config
+    );
 
     console.log('Server Response:', response.data);
 
