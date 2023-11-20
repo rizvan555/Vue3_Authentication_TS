@@ -60,13 +60,15 @@ app.post('/users/login', async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: 'Email not found' });
     }
-    console.log('User entered password:', req.body.password);
-    console.log('Database password:', user.password);
 
+    const enteredPassword = req.body.password;
     const isPasswordValid = await bcrypt.compare(
-      req.body.password,
+      enteredPassword,
       user.password
     );
+
+    console.log('User entered password:', req.body.password);
+    console.log('Database password:', user.password);
     console.log('isPasswordValid:', isPasswordValid);
 
     if (!isPasswordValid) {
